@@ -1,8 +1,8 @@
 from django.contrib import messages
 from django.http.response import JsonResponse
 from django.shortcuts import redirect, render
-
-from myapp.models import Cart, Order, OrderItem, product
+from django.contrib.auth.models import User
+from myapp.models import Cart, Order, OrderItem, product, Profile
 from myapp.views import productview
 import random
 
@@ -19,11 +19,32 @@ def checks(request):
     for item in cartitems:
         total_price = total_price + item.product.s_price * item.product_qty
         
-    context = {'cartitems':cartitems, 'total_price':total_price}
+    userprofile = Profile.objects.filter(user=request.user).first()
+        
+    context = {'cartitems':cartitems, 'total_price':total_price, 'userprofile':userprofile}
     return render(request, "layout/checkout.html", context)
 
 def placeorder(request):
     if request.method == 'POST':
+        
+        currentuser = User.objects.filter(id=request.user.id).first()
+        
+        if not currentuser.first_name :
+            currentuser.first_name = request.POST.get('Fname')
+            currentuser.last_name = request.POST.get('Lname')
+            currentuser.save()
+            
+        if not Profile.objects.filter(user=request.user):
+            userprofile = Profile()
+            userprofile.user = request.user
+            userprofile.Contact = request.POST.get('Contact')
+            userprofile.Address = request.POST.get('Address')
+            userprofile.Baranggay = request.POST.get('Baranggay')
+            userprofile.City = request.POST.get('City')
+            userprofile.Pincode = request.POST.get('Pincode')
+            userprofile.save()
+          
+ 
         neworder = Order()
         neworder.user =  request.user
         neworder.Fname = request.POST.get('Fname')

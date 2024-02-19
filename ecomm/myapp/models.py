@@ -102,10 +102,17 @@ class OrderItem(models.Model):
     def __str__(self):
         return '{} - {}'.format(self.order.id, self.order.tracking_no)
     
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    Contact = models.CharField(max_length=50,null=False)
+    Address = models.TextField(null=False)
+    Baranggay = models.CharField(max_length=150, null=False)
+    City = models.CharField(max_length=150, null=False)
+    Pincode = models.CharField(max_length=150, null=False)
+    created_at = models.DateTimeField(auto_now_add=True)
     
-    
-    
-    
+    def __str__(self):
+        return self.user.username
     
     
     
